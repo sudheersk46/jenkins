@@ -1,0 +1,34 @@
+pipeline{
+
+agent{label 'ubuntu'} 
+
+stages { 
+    stage('creds') {
+        
+        steps {
+ 
+withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'linux',
+usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]){
+sh 'echo uname=$USERNAME pwd=$PASSWORD'
+}
+}
+}
+stage('blkid') {
+        steps {
+           withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'linux',
+           usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]){
+
+sh ' tt=$(echo "$PASSWORD" | sudo -S blkid)  '
+sh 'echo $tt'
+}
+}
+}
+//sh 'echo $USERNAME $PASSWORD | sudo tee -a  >> /tmp/pass'
+stage('cat') {
+        steps {
+sh 'echo $PASSWORD >> /tmp/pass'
+sh 'cat /tmp/pass'
+ }
+}
+}
+}
